@@ -1,4 +1,4 @@
-import { https } from "firebase-functions";
+import { https, Request } from "firebase-functions";
 import admin from "firebase-admin";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
@@ -8,14 +8,13 @@ import { ensureAuthenticated } from "./middleware/auth";
 admin.initializeApp();
 
 exports.createUser = https.onCall(async (data: any) => {
-  const { name, username, email, password } = data;
+  const { name, email, password } = data;
 
   const nameType = typeof name === "string" && name.length > 0;
-  const usernameType = typeof username === "string" && username.length > 0;
   const emailType = typeof email === "string" && email.length > 0;
   const passwordType = typeof password === "string" && password.length > 0;
 
-  if (!(nameType && usernameType && emailType && passwordType)) {
+  if (!(nameType && emailType && passwordType)) {
     throw new https.HttpsError(
       "invalid-argument",
       "The function must me called with the correct arguments"
@@ -40,7 +39,6 @@ exports.createUser = https.onCall(async (data: any) => {
 
   const writeResult = await admin.firestore().collection("users").add({
     name,
-    username,
     email,
     password: passwordEncripted,
   });
@@ -52,8 +50,8 @@ exports.createUser = https.onCall(async (data: any) => {
   };
 });
 
-exports.login = https.onRequest(async (req: any, res: any) => {
-  const { email, password } = req.body.data;
+exports.login = https.onCall(async (data: any) => {
+  const { email, password } = data;
 
   const emailType = typeof email === "string" && email.length > 0;
 
@@ -97,25 +95,27 @@ exports.login = https.onRequest(async (req: any, res: any) => {
     .where("email", "==", email)
     .get();
 
-  const userLogged = userLoggedRef.docs[0].data();
-
-  const response = {
-    success: true,
-    message: "User created with success",
-    result: userLogged,
+  const userLogged = {
+    id: userLoggedRef.docs[0].id,
+    ...userLoggedRef.docs[0].data(),
   };
 
-  res.json(response);
+  return {
+    success: true,
+    message: "User logged with success",
+    result: userLogged,
+  };
 });
 
-exports.addNote = https.onRequest(async (req: any, res: any) => {
-  const userData = await ensureAuthenticated(req);
+exports.addNote = https.onCall(async (data: any) => {
+  console.log(data);
+  const userData = await ensureAuthenticated(data.token);
 
   if (!userData) {
     throw new https.HttpsError("unauthenticated", "User is not logged in");
   }
 
-  const { userId, taskText } = req.body.data;
+  const { userId, taskText } = data;
 
   const userIdType = typeof userId === "string" && userId.length > 0;
 
@@ -145,13 +145,12 @@ exports.addNote = https.onRequest(async (req: any, res: any) => {
       ...note,
     });
 
-  const response = {
+  return {
     success: true,
     message: "User created with success",
     result: (await writeResult.get()).data(),
   };
 
-  res.json(response);
 });
 
 exports.changeNoteStatus = https.onRequest(async (req: any, res: any) => {
@@ -191,15 +190,16 @@ exports.changeNoteStatus = https.onRequest(async (req: any, res: any) => {
   res.json(response);
 });
 
-exports.listAllNotesByUser = https.onRequest(async (req: any, res: any) => {
-  const { userId } = req.body.data;
-  const isUserLogged = await ensureAuthenticated(req);
+exports.listAllNotesByUser = https.onCall(async (data: any) => {
+  const {user: userString } = await ensureAuthenticated(data.token);
 
-  if (!isUserLogged) {
+  const user = JSON.parse(userString);
+
+  if (!user) {
     throw new https.HttpsError("unauthenticated", "User is not logged in");
   }
 
-  const userExists = await admin.firestore().doc(`users/${userId}`).get();
+  const userExists = await admin.firestore().doc(`users/${user.id}`).get();
 
   if (!userExists.exists) {
     throw new https.HttpsError("not-found", "User logged does not exists");
@@ -209,7 +209,7 @@ exports.listAllNotesByUser = https.onRequest(async (req: any, res: any) => {
     const notesRef = await admin
       .firestore()
       .collection("notes")
-      .where("userId", "==", userId)
+      .where("userId", "==", user.id)
       .get();
 
     const [notesData] = await Promise.all([
@@ -221,13 +221,45 @@ exports.listAllNotesByUser = https.onRequest(async (req: any, res: any) => {
       }),
     ]);
 
-    const response = {
+    return {
       success: true,
       message: "User created with success",
       result: notesData,
     };
+  } catch (error) {
+    throw new https.HttpsError("not-found", "User logged does not exists");
+  }
+});
 
-    res.json(response);
+exports.deleteNoteByUser = https.onCall(async (data: any) => {
+  const { user: userString } = await ensureAuthenticated(data.token);
+  const { id } = data;
+
+  const user = JSON.parse(userString);
+
+  if (!user) {
+    throw new https.HttpsError("unauthenticated", "User is not logged in");
+  }
+
+  const userExists = await admin.firestore().doc(`users/${user.id}`).get();
+
+  if (!userExists.exists) {
+    throw new https.HttpsError("not-found", "User logged does not exists");
+  }
+
+  const noteExists = await admin.firestore().doc(`notes/${id}`).get();
+
+  if (!noteExists.exists) {
+    throw new https.HttpsError("not-found", "Note does not exists");
+  }
+
+  try {
+    await noteExists.ref.delete();
+
+    return {
+      success: true,
+      message: "User created with success",
+    }
   } catch (error) {
     throw new https.HttpsError("not-found", "User logged does not exists");
   }

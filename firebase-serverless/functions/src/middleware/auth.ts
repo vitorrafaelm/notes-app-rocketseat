@@ -1,28 +1,24 @@
 import { verify } from "jsonwebtoken";
 
 interface IPayload {
-  user: {
-    id: string;
-  };
+  user: string;
 }
 
 export async function ensureAuthenticated(
-  request: any,
-) {
-
-  const token = request.headers.authorization;
+  token: any,
+): Promise<IPayload> {
 
   if (!token) {
     throw new Error('Token missing');
   }
 
   try {
-    verify(
+    const user =  verify(
       token,
       '7783698978206a7dab23a62285724408',
     ) as IPayload;
     
-    return true;
+    return user;
   } catch (error) {
     throw new Error('Invalid token');
   }

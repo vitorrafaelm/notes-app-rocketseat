@@ -1,0 +1,168 @@
+.header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  height: 200px;
+  background-color: var(--gray-700);
+
+  position: relative;
+}
+
+.createToDosection {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  align-self: center;
+
+  gap: 1rem;
+  position: absolute;
+
+  margin-bottom: -12.5rem;
+
+  max-width: 45rem;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  margin-top: 5rem;
+}
+
+.content section {
+  max-width: 45rem;
+}
+
+.content section header {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+
+  width: 45rem;
+}
+
+.todoQuantity {
+  display: flex;
+}
+
+.todoQuantity p {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 17px;
+
+  color: #4ea8de;
+}
+
+.todoQuantity span {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 2px 8px;
+  gap: 10px;
+
+  width: 25px;
+  height: 19px;
+
+  background: #333333;
+  border-radius: 999px;
+
+  margin-left: 0.5rem;
+}
+
+.todoDone {
+  display: flex;
+}
+
+.todoDone p {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 17px;
+
+  color: #8284fa;
+}
+
+.todoDone span {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2px 8px;
+  gap: 10px;
+
+  width: 52px;
+  height: 19px;
+
+  background: var(--gray-400);
+  border-radius: 999px;
+
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 15px;
+
+  color: var(--gray-200);
+
+  margin-left: 0.5rem;
+}
+
+.todoList {
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 64px 24px;
+  width: 45rem;
+
+  margin-top: 1.5625rem;
+
+  border-top: 1px solid var(--gray-400);
+  border-radius: 8px;
+}
+
+.todoListNoBorder {
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 45rem;
+
+  margin-top: 1.5625rem;
+}
+
+.voidTodoList {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.voidTodoList p:nth-child(2) {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 140%;
+
+  text-align: center;
+
+  color: var(--gray-300);
+  margin-top: 1rem;
+}
+
+.voidTodoList p:nth-child(3) {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 140%;
+
+  text-align: center;
+
+  color: var(--gray-300);
+}
