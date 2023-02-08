@@ -8,3 +8,10 @@
 
     background-color: var(--gray-700);
 }
+
+@media (max-width: 600px)
+{
+  .header {
+    padding: 0.875rem 1rem;
+  }
+}

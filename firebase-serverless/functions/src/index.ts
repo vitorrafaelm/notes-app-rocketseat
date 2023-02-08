@@ -108,7 +108,6 @@ exports.login = https.onCall(async (data: any) => {
 });
 
 exports.addNote = https.onCall(async (data: any) => {
-  console.log(data);
   const userData = await ensureAuthenticated(data.token);
 
   if (!userData) {
@@ -150,7 +149,6 @@ exports.addNote = https.onCall(async (data: any) => {
     message: "User created with success",
     result: (await writeResult.get()).data(),
   };
-
 });
 
 exports.changeNoteStatus = https.onRequest(async (req: any, res: any) => {
@@ -175,11 +173,7 @@ exports.changeNoteStatus = https.onRequest(async (req: any, res: any) => {
 
   await noteToUpdate.ref.update({ done });
 
-  noteToUpdate = await admin
-    .firestore()
-    .collection("notes")
-    .doc(noteId)
-    .get();
+  noteToUpdate = await admin.firestore().collection("notes").doc(noteId).get();
 
   const response = {
     success: true,
@@ -191,7 +185,7 @@ exports.changeNoteStatus = https.onRequest(async (req: any, res: any) => {
 });
 
 exports.listAllNotesByUser = https.onCall(async (data: any) => {
-  const {user: userString } = await ensureAuthenticated(data.token);
+  const { user: userString } = await ensureAuthenticated(data.token);
 
   const user = JSON.parse(userString);
 
@@ -206,6 +200,7 @@ exports.listAllNotesByUser = https.onCall(async (data: any) => {
   }
 
   try {
+    console.log(user);
     const notesRef = await admin
       .firestore()
       .collection("notes")
@@ -216,14 +211,14 @@ exports.listAllNotesByUser = https.onCall(async (data: any) => {
       notesRef.docs.map((doc) => {
         return {
           id: doc.id,
-          ...doc.data()
+          ...doc.data(),
         };
       }),
     ]);
 
     return {
       success: true,
-      message: "User created with success",
+      message: "Notes",
       result: notesData,
     };
   } catch (error) {
@@ -259,7 +254,43 @@ exports.deleteNoteByUser = https.onCall(async (data: any) => {
     return {
       success: true,
       message: "User created with success",
-    }
+    };
+  } catch (error) {
+    throw new https.HttpsError("not-found", "User logged does not exists");
+  }
+});
+
+exports.changeNoteStatus = https.onCall(async (data: any) => {
+  const { user: userString } = await ensureAuthenticated(data.token);
+  const { id, done } = data;
+
+  const user = JSON.parse(userString);
+
+  if (!user) {
+    throw new https.HttpsError("unauthenticated", "User is not logged in");
+  }
+
+  const userExists = await admin.firestore().doc(`users/${user.id}`).get();
+
+  if (!userExists.exists) {
+    throw new https.HttpsError("not-found", "User logged does not exists");
+  }
+
+  const noteExists = await admin.firestore().doc(`notes/${id}`).get();
+
+  if (!noteExists.exists) {
+    throw new https.HttpsError("not-found", "Note does not exists");
+  }
+
+  try {
+    await noteExists.ref.update({
+      done,
+    });
+
+    return {
+      success: true,
+      message: "Note Updateds",
+    };
   } catch (error) {
     throw new https.HttpsError("not-found", "User logged does not exists");
   }

@@ -6,8 +6,9 @@
   padding: 16px;
   gap: 12px;
 
-  width: 45rem;
+  /* width: 45rem; */
   height: 72px;
+  max-width: 100vw;
 
   background: var(--gray-500);
 
@@ -16,6 +17,14 @@
   border-radius: 8px;
 
   margin-bottom: 1rem;
+}
+
+@media (max-width: 600px)
+{
+  .todoContainer {
+    margin-left: 1rem;
+    margin-right: 1rem;
+  }
 }
 
 .todoContainer p {
@@ -33,4 +42,8 @@
   justify-content: flex-start;
 
   width: 100%;
+}
+
+.todoContainer > img:hover {
+  cursor: pointer;
 }

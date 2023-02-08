@@ -6,15 +6,17 @@ import Logo from "../../assets/logo.png";
 import { Input } from "../../components/input";
 import { Button } from "../../components/button";
 import { useUser } from "../../contexts/userContext";
-import { FormEvent, useRef } from "react";
+import { FormEvent, useRef, useState } from "react";
 
 export function Login(): JSX.Element {
   const { login } = useUser();
+  const [isLogginLoading, setIsLoginLoading] = useState<boolean>(false);
 
   const emailRef = useRef<HTMLInputElement>();
   const passwordRef = useRef<HTMLInputElement>();
 
   async function handleLogin(event: FormEvent) {
+    setIsLoginLoading(true);
     event.preventDefault();
     const email = emailRef.current?.value;
     const password = passwordRef.current?.value;
@@ -26,6 +28,7 @@ export function Login(): JSX.Element {
     if (emailVerified && passwordVerified) {
       await login(email, password);
     }
+    setIsLoginLoading(false);
   }
 
   return (
@@ -51,8 +54,8 @@ export function Login(): JSX.Element {
             />
 
             <div className={styles.buttonBox}>
-              <Link to="/home">
-                <Button title="Entrar" onClick={handleLogin} />
+              <Link to="/home" style={{ textDecoration: 'none' }}>
+                <Button title="Entrar" onClick={handleLogin} loading={isLogginLoading} />
               </Link>
             </div>
           </form>

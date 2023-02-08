@@ -44,7 +44,7 @@ export function Register(): JSX.Element {
 
   return (
     <main>
-      <Link to="/login">
+      <Link to="/login" style={{ textDecoration: 'none '}}>
         <HeaderLogout buttonTitle="Entrar" buttonOnClickButton={() => {}} />
       </Link>
 
@@ -82,8 +82,6 @@ export function Register(): JSX.Element {
 
             <div className={styles.buttonBox}>
               <Button title="Cadastrar" onClick={register} />
-              <span>Or</span>
-              <Button title="SignUp With Google" />
             </div>
           </form>
         </div>

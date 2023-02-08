@@ -17,7 +17,7 @@ type UserNotes = {
   id: string;
   taskText: string;
   userId: string;
-  done: string;
+  done: boolean;
 };
 
 type UserContextData = {

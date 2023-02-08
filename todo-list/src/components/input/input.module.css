@@ -1,5 +1,6 @@
 .inputField {
-  width: 407px;
+  width: 100%;
+  max-width: 80%;
   height: 54px;
 
   background: var(--gray-500);
@@ -9,4 +10,11 @@
   padding: 0px 16px;
 
   color: #fff;
+}
+
+@media (max-width: 600px)
+{
+  .inputField {
+    max-width: 320px;
+  }
 }

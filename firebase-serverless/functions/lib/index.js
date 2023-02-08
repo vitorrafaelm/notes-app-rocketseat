@@ -71,7 +71,6 @@ exports.login = firebase_functions_1.https.onCall(async (data) => {
     };
 });
 exports.addNote = firebase_functions_1.https.onCall(async (data) => {
-    console.log(data);
     const userData = await (0, auth_1.ensureAuthenticated)(data.token);
     if (!userData) {
         throw new firebase_functions_1.https.HttpsError("unauthenticated", "User is not logged in");
@@ -116,11 +115,7 @@ exports.changeNoteStatus = firebase_functions_1.https.onRequest(async (req, res)
         .doc(noteId)
         .get();
     await noteToUpdate.ref.update({ done });
-    noteToUpdate = await firebase_admin_1.default
-        .firestore()
-        .collection("notes")
-        .doc(noteId)
-        .get();
+    noteToUpdate = await firebase_admin_1.default.firestore().collection("notes").doc(noteId).get();
     const response = {
         success: true,
         message: "User created with success",
@@ -139,6 +134,7 @@ exports.listAllNotesByUser = firebase_functions_1.https.onCall(async (data) => {
         throw new firebase_functions_1.https.HttpsError("not-found", "User logged does not exists");
     }
     try {
+        console.log(user);
         const notesRef = await firebase_admin_1.default
             .firestore()
             .collection("notes")
@@ -151,7 +147,7 @@ exports.listAllNotesByUser = firebase_functions_1.https.onCall(async (data) => {
         ]);
         return {
             success: true,
-            message: "User created with success",
+            message: "Notes",
             result: notesData,
         };
     }
@@ -179,6 +175,34 @@ exports.deleteNoteByUser = firebase_functions_1.https.onCall(async (data) => {
         return {
             success: true,
             message: "User created with success",
+        };
+    }
+    catch (error) {
+        throw new firebase_functions_1.https.HttpsError("not-found", "User logged does not exists");
+    }
+});
+exports.changeNoteStatus = firebase_functions_1.https.onCall(async (data) => {
+    const { user: userString } = await (0, auth_1.ensureAuthenticated)(data.token);
+    const { id, done } = data;
+    const user = JSON.parse(userString);
+    if (!user) {
+        throw new firebase_functions_1.https.HttpsError("unauthenticated", "User is not logged in");
+    }
+    const userExists = await firebase_admin_1.default.firestore().doc(`users/${user.id}`).get();
+    if (!userExists.exists) {
+        throw new firebase_functions_1.https.HttpsError("not-found", "User logged does not exists");
+    }
+    const noteExists = await firebase_admin_1.default.firestore().doc(`notes/${id}`).get();
+    if (!noteExists.exists) {
+        throw new firebase_functions_1.https.HttpsError("not-found", "Note does not exists");
+    }
+    try {
+        await noteExists.ref.update({
+            done,
+        });
+        return {
+            success: true,
+            message: "Note Updateds",
         };
     }
     catch (error) {

@@ -15,7 +15,7 @@ export function HeaderLogout({ buttonTitle, buttonOnClickButton }: HeaderLogoutP
     return (
         <header className={styles.header}>
             <img src={Logo} alt="Logo" />
-            <Link to={!identifyScreen ? '/' : '/login'}>
+            <Link to={!identifyScreen ? '/' : '/login'} style={{ textDecoration: 'none' }}>
                 <Button title={buttonTitle} onClick={buttonOnClickButton} />
             </Link>
         </header>

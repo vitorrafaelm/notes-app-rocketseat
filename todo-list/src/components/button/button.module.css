@@ -3,7 +3,9 @@
     justify-content: center;
     align-items: center;
 
-    padding: 16px 60px;
+    min-width: 150px;
+
+    padding: 16px;
     background-color: var(--blue-dark);
     border: none;
     border-radius: 8px;
@@ -13,11 +15,12 @@
     cursor: pointer;
 }
 
-.button span {
-    font-family: 'Inter';
+.button p {
+    font-family: 'Inter', sans-serif;
     font-style: normal;
     font-weight: 700;
     font-size: 18px;
-    line-height: 140%;
     color: var(--gray-100);
+
+    text-decoration: none;
 }
